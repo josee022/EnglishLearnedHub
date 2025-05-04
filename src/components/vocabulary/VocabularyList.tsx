@@ -19,6 +19,11 @@ export default function VocabularyList() {
   const navigate = useNavigate();
 
   const [folderName, setFolderName] = useState<string>('Todo el vocabulario');
+  const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
+  
+  const handleToggleDetails = (itemId: string) => {
+    setExpandedItemId(expandedItemId === itemId ? null : itemId);
+  };
   
   useEffect(() => {
     const fetchVocabulary = async () => {
@@ -112,20 +117,31 @@ export default function VocabularyList() {
     <div className="container mx-auto px-4 py-6">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Mi Vocabulario</h1>
-          {selectedFolder && <p className="text-gray-600 dark:text-gray-400 mt-1">Carpeta: {folderName}</p>}
+          <h1 className="text-2xl font-bold text-blue-700 dark:text-blue-400">Mi Vocabulario</h1>
+          {selectedFolder && <p className="text-slate-600 dark:text-slate-300 mt-1">Carpeta: <span className="font-semibold">{folderName}</span></p>}
         </div>
         <div className="flex space-x-2">
+          {selectedFolder && (
+            <button
+              onClick={() => navigate('/vocabulary')}
+              className="inline-flex items-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-100 rounded-md transition-colors shadow-sm"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+              </svg>
+              Todo mi vocabulario
+            </button>
+          )}
           <button
             onClick={navigateToFolders}
-            className="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded-md transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-800 dark:bg-indigo-800 dark:hover:bg-indigo-700 dark:text-indigo-100 rounded-md transition-colors shadow-sm"
           >
             <FolderIcon className="w-5 h-5 mr-2" />
             Carpetas
           </button>
           <button
             onClick={navigateToAddVocabulary}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors shadow-sm"
           >
             <PlusIcon className="w-5 h-5 mr-2" />
             Añadir
@@ -133,17 +149,10 @@ export default function VocabularyList() {
         </div>
       </div>
 
-      <div className="mb-6">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Buscar palabra, traducción o notas..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-3 pl-10 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
-          />
+      <div className="relative mb-6">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <svg 
-            className="absolute left-3 top-3.5 w-5 h-5 text-gray-400 dark:text-gray-500" 
+            className="w-5 h-5 text-slate-400 dark:text-slate-500" 
             fill="none" 
             stroke="currentColor" 
             viewBox="0 0 24 24" 
@@ -157,6 +166,13 @@ export default function VocabularyList() {
             />
           </svg>
         </div>
+        <input
+          type="text"
+          placeholder="Buscar palabra, traducción o notas..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="block w-full pl-10 pr-3 py-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+        />
       </div>
 
       {error && (
@@ -166,7 +182,10 @@ export default function VocabularyList() {
       )}
 
       {filteredItems.length === 0 ? (
-        <div className="text-center py-16 border border-dashed border-gray-300 dark:border-gray-700 rounded-md">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm p-4 mb-8 border border-slate-200 dark:border-slate-700">
+          <div className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+            Filtrar por nivel de dominio:
+          </div>
           <svg
             className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
             fill="none"
@@ -197,11 +216,13 @@ export default function VocabularyList() {
           )}
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {filteredItems.map(item => (
             <VocabularyListItem
               key={item.id}
               item={item}
+              isExpanded={expandedItemId === item.id}
+              onToggleDetails={() => handleToggleDetails(item.id)}
               onDelete={() => handleDelete(item.id)}
               onEdit={() => handleEdit(item.id)}
             />

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { addVocabularyItem, updateVocabularyItem, getVocabularyItem, getFolders } from '../../firebase/firestore';
 import { useAuthContext } from '../../context/AuthContext';
 import { VocabularyItem, Folder } from '../../types';
-import { PlusIcon, XMarkIcon, FolderIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, XMarkIcon, FolderIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 interface VocabularyFormProps {
   isEditing?: boolean;
@@ -197,6 +197,14 @@ export default function VocabularyForm({ isEditing = false }: VocabularyFormProp
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-3xl">
+      <button
+        onClick={() => navigate('/vocabulary')}
+        className="flex items-center text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-6 transition-colors"
+      >
+        <ArrowLeftIcon className="w-5 h-5 mr-2" />
+        Volver a Vocabulario
+      </button>
+      
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
           {isEditing ? 'Editar Palabra' : 'Añadir Nueva Palabra'}
