@@ -3,15 +3,15 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getAnalytics } from 'firebase/analytics';
 
-// Configuración de Firebase
+// Configuración de Firebase usando variables de entorno
 const firebaseConfig = {
-  apiKey: "AIzaSyDV6xRWYFwEFISy0EB1w1QpL3ZRoHZqVAQ",
-  authDomain: "english-learned-hub.firebaseapp.com",
-  projectId: "english-learned-hub",
-  storageBucket: "english-learned-hub.firebasestorage.app",
-  messagingSenderId: "747286577699",
-  appId: "1:747286577699:web:ac6d4984d6418658232796",
-  measurementId: "G-0WTBX1DGFQ"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Inicializar Firebase
