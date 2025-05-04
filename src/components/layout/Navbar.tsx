@@ -11,7 +11,7 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="bg-white shadow-sm dark:bg-gray-800">
+    <nav className="bg-white shadow-sm dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">

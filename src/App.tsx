@@ -9,6 +9,7 @@ import { Register } from './pages/Register';
 
 // Páginas protegidas
 import { Dashboard } from './pages/Dashboard';
+import Vocabulary from './pages/Vocabulary';
 
 // Estilos
 import './index.css';
@@ -33,18 +34,10 @@ function App() {
             } 
           />
           
-          {/* Rutas por implementar */}
-          <Route 
-            path="/vocabulary" 
-            element={
-              <ProtectedRoute>
-                <div className="p-8 text-center">
-                  <h1 className="text-2xl font-bold mb-4">Vocabulario</h1>
-                  <p>Esta sección está en desarrollo.</p>
-                </div>
-              </ProtectedRoute>
-            } 
-          />
+          {/* Rutas de vocabulario */}
+          <Route path="/vocabulary" element={<ProtectedRoute><Vocabulary /></ProtectedRoute>} />
+          <Route path="/vocabulary/:action" element={<ProtectedRoute><Vocabulary /></ProtectedRoute>} />
+          <Route path="/vocabulary/:action/:id" element={<ProtectedRoute><Vocabulary /></ProtectedRoute>} />
           
           <Route 
             path="/flashcards" 

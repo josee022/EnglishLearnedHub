@@ -210,24 +210,55 @@ export const addFolder = async (userId: string, folder: Omit<Folder, 'id'>) => {
   }
 };
 
-export const getFolders = async (userId: string) => {
+export const getFolders = async (userId: string): Promise<Folder[]> => {
   try {
     if (!userId) throw new Error('userId es requerido');
     
-    const querySnapshot = await getDocs(foldersCollection(userId));
-    return querySnapshot.docs.map(doc => {
+    const folderCollectionRef = foldersCollection(userId);
+    
+    const snapshot = await getDocs(folderCollectionRef);
+    
+    const folders: Folder[] = [];
+    
+    snapshot.forEach((doc) => {
       const data = doc.data();
-      
-      // Convertir los campos Timestamp a Date
-      const folderWithDates = convertTimestampsToDates(data, ['createdAt']);
-      
-      return {
+      folders.push({
         id: doc.id,
-        ...folderWithDates
-      } as unknown as Folder; // El as unknown es necesario para la conversión de tipos
+        name: data.name,
+        description: data.description,
+        userId: data.userId,
+        createdAt: timestampToDate(data.createdAt) || new Date(),
+      });
     });
+    
+    return folders;
   } catch (error) {
     console.error('Error al obtener carpetas:', error);
+    throw error;
+  }
+};
+
+export const getFolderById = async (userId: string, folderId: string): Promise<Folder | null> => {
+  try {
+    if (!userId || !folderId) throw new Error('userId y folderId son requeridos');
+    
+    const folderDocRef = doc(foldersCollection(userId), folderId);
+    const folderDoc = await getDoc(folderDocRef);
+    
+    if (!folderDoc.exists()) {
+      return null;
+    }
+    
+    const data = folderDoc.data();
+    return {
+      id: folderDoc.id,
+      name: data.name,
+      description: data.description,
+      userId: data.userId,
+      createdAt: timestampToDate(data.createdAt) || new Date(),
+    };
+  } catch (error) {
+    console.error('Error al obtener la carpeta:', error);
     throw error;
   }
 };
