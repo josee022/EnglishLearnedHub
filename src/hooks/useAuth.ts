@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { 
-  GoogleAuthProvider, 
-  signInWithPopup, 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   signOut,
@@ -106,20 +104,7 @@ export function useAuth() {
     }
   };
 
-  // Inicio de sesión con Google
-  const loginWithGoogle = async () => {
-    try {
-      setError(null);
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-      return true;
-    } catch (err) {
-      const authError = err as AuthError;
-      console.error('Error al iniciar sesión con Google:', authError);
-      setError(authError.message || 'Error al iniciar sesión con Google');
-      return false;
-    }
-  };
+  // No usamos autenticación con Google
 
   // Cerrar sesión
   const logout = async () => {
@@ -156,7 +141,6 @@ export function useAuth() {
     error,
     registerWithEmail,
     loginWithEmail,
-    loginWithGoogle,
     logout,
     updateUserProfile
   };

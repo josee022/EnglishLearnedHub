@@ -8,7 +8,6 @@ interface AuthContextType {
   error: string | null;
   registerWithEmail: (email: string, password: string, displayName: string) => Promise<boolean>;
   loginWithEmail: (email: string, password: string) => Promise<boolean>;
-  loginWithGoogle: () => Promise<boolean>;
   logout: () => Promise<boolean>;
   updateUserProfile: (data: Partial<User>) => Promise<boolean>;
 }
