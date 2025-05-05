@@ -4,7 +4,8 @@ import { getVocabularyItems, deleteVocabularyItem, getFolderById } from '../../f
 import { useAuthContext } from '../../context/AuthContext';
 import { VocabularyItem } from '../../types';
 import VocabularyListItem from './VocabularyListItem';
-import { PlusIcon, FolderIcon } from '@heroicons/react/24/outline';
+import AddExistingToFolder from './AddExistingToFolder';
+import { PlusIcon, FolderIcon, ArrowDownOnSquareIcon } from '@heroicons/react/24/outline';
 
 export default function VocabularyList() {
   const [vocabularyItems, setVocabularyItems] = useState<VocabularyItem[]>([]);
@@ -20,13 +21,20 @@ export default function VocabularyList() {
 
   const [folderName, setFolderName] = useState<string>('Todo el vocabulario');
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
+  const [showAddExistingModal, setShowAddExistingModal] = useState(false);
   
   const handleToggleDetails = (itemId: string) => {
     setExpandedItemId(expandedItemId === itemId ? null : itemId);
   };
   
-  useEffect(() => {
-    const fetchVocabulary = async () => {
+  const handleAddExistingComplete = () => {
+    // Recargar la lista después de añadir palabras a la carpeta
+    if (user) {
+      fetchVocabulary();
+    }
+  };
+  
+  const fetchVocabulary = async () => {
       if (!user) return;
       
       try {
@@ -56,7 +64,10 @@ export default function VocabularyList() {
       }
     };
 
+  // Cargar vocabulario al iniciar o cuando cambia la carpeta seleccionada
+  useEffect(() => {
     fetchVocabulary();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, selectedFolder]);
   
   // Actualizar la selección de carpeta cuando cambia la URL
@@ -118,7 +129,22 @@ export default function VocabularyList() {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-2xl font-bold text-blue-700 dark:text-blue-400">Mi Vocabulario</h1>
-          {selectedFolder && <p className="text-slate-600 dark:text-slate-300 mt-1">Carpeta: <span className="font-semibold">{folderName}</span></p>}
+          <div className="flex items-center justify-between mt-2">
+            <p className="text-slate-600 dark:text-slate-300 font-medium text-lg">
+              {folderName}
+            </p>
+            
+            {/* Mostrar botón de añadir existentes solo cuando se está en una carpeta */}
+            {selectedFolder && (
+              <button
+                onClick={() => setShowAddExistingModal(true)}
+                className="inline-flex items-center px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md transition-colors text-sm gap-1 ml-4"
+              >
+                <ArrowDownOnSquareIcon className="h-4 w-4" />
+                <span>Añadir existentes</span>
+              </button>
+            )}
+          </div>
         </div>
         <div className="flex space-x-2">
           {selectedFolder && (
@@ -228,6 +254,15 @@ export default function VocabularyList() {
             />
           ))}
         </div>
+      )}
+      
+      {/* Modal para añadir palabras existentes */}
+      {showAddExistingModal && selectedFolder && (
+        <AddExistingToFolder
+          folderId={selectedFolder}
+          onClose={() => setShowAddExistingModal(false)}
+          onAddComplete={handleAddExistingComplete}
+        />
       )}
     </div>
   );

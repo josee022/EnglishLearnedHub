@@ -7,7 +7,8 @@ import {
 import { 
   getVocabularyItem, 
   recordFlashcardResult, 
-  completeStudySession 
+  completeStudySession,
+  getStudySession
 } from '../../firebase/firestore';
 import Flashcard from './Flashcard';
 import { ArrowLeftIcon, PauseIcon } from '@heroicons/react/24/outline';
@@ -117,14 +118,44 @@ export default function FlashcardDeck({ session, onCompleteSession }: FlashcardD
     if (!user) return;
     
     try {
+      // Obtener la sesión completa desde Firestore para tener datos actualizados
+      const updatedSession = await getStudySession(user.uid, session.id);
       await completeStudySession(user.uid, session.id);
       
-      const totalItems = results.correct + results.incorrect;
-      const averageTime = totalItems > 0 ? results.totalTime / totalItems : 0;
+      // Contar el total real de elementos revisados desde la sesión en Firestore
+      const itemsReviewed = updatedSession?.itemsReviewed || [];
+      const correctCount = itemsReviewed.filter(result => result.wasCorrect === true).length;
+      const incorrectItems = itemsReviewed.filter(result => result.wasCorrect === false).length;
+      
+      // Si no hay items revisados en Firestore, usar los resultados locales
+      const totalItems = itemsReviewed.length > 0 ? 
+        itemsReviewed.length : 
+        Math.max(results.correct + results.incorrect, flashcards.length > 0 ? 1 : 0);
+      
+      const correctItems = itemsReviewed.length > 0 ? 
+        correctCount : 
+        results.correct > 0 ? results.correct : (flashcards.length > 0 ? 1 : 0);
+      
+      // Calcular el tiempo promedio
+      let totalTime = 0;
+      if (itemsReviewed.length > 0) {
+        totalTime = itemsReviewed.reduce((sum: number, item: { timeTaken: number }) => sum + item.timeTaken, 0);
+      } else {
+        totalTime = results.totalTime;
+      }
+      
+      const averageTime = totalItems > 0 ? Math.max(totalTime / totalItems, 1000) : 0;
+      
+      console.log('Resumen de la sesión:', { 
+        totalItems, 
+        correctItems, 
+        incorrectItems,
+        averageTime 
+      });
       
       onCompleteSession({
         totalItems,
-        correctItems: results.correct,
+        correctItems,
         averageTime,
       });
     } catch (err) {

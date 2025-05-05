@@ -361,8 +361,34 @@ export const createStudySession = async (
         if (levelDiff !== 0) return levelDiff;
         
         // Si tienen el mismo nivel, priorizar por fecha de próxima revisión
-        const aDate = a.nextReviewDate || now;
-        const bDate = b.nextReviewDate || now;
+        // Asegurarnos de que las fechas son objetos Date válidos
+        let aDate = now;
+        let bDate = now;
+        
+        // Validar que a.nextReviewDate es un objeto Date o puede convertirse en uno
+        if (a.nextReviewDate) {
+          if (a.nextReviewDate instanceof Date) {
+            aDate = a.nextReviewDate;
+          } else if (typeof a.nextReviewDate === 'object' && a.nextReviewDate.toDate) {
+            // Si es un Timestamp de Firestore
+            aDate = a.nextReviewDate.toDate();
+          } else {
+            console.warn('nextReviewDate no es un objeto Date válido:', a.nextReviewDate);
+          }
+        }
+        
+        // Validar que b.nextReviewDate es un objeto Date o puede convertirse en uno
+        if (b.nextReviewDate) {
+          if (b.nextReviewDate instanceof Date) {
+            bDate = b.nextReviewDate;
+          } else if (typeof b.nextReviewDate === 'object' && b.nextReviewDate.toDate) {
+            // Si es un Timestamp de Firestore
+            bDate = b.nextReviewDate.toDate();
+          } else {
+            console.warn('nextReviewDate no es un objeto Date válido:', b.nextReviewDate);
+          }
+        }
+        
         return aDate.getTime() - bDate.getTime();
       });
     
@@ -373,17 +399,21 @@ export const createStudySession = async (
     
     // Crear la sesión de estudio
     const sessionId = doc(studySessionsCollection(userId)).id;
-    const session: StudySession = {
+    
+    // Crear un objeto base con todos los campos obligatorios
+    const sessionBase: Omit<StudySession, 'folderId'> = {
       id: sessionId,
       userId,
       createdAt: new Date(),
       mode,
-      folderId,
       itemsToReview: selectedItems.map(item => item.id),
       itemsReviewed: [],
       currentIndex: 0,
       completed: false
     };
+    
+    // Añadir folderId solo si no es undefined (Firestore no acepta undefined)
+    const session = folderId ? { ...sessionBase, folderId } : sessionBase;
     
     // Guardar en Firestore
     const sessionDoc = doc(studySessionsCollection(userId), sessionId);

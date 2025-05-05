@@ -65,24 +65,37 @@ export default function StudySessionSetup({ onStartSession }: StudySessionSetupP
   }, [user]);
 
   // Inicio de una nueva sesión
-  const handleStartSession = async () => {
+  const handleCreateSession = async () => {
     if (!user) return;
     
     try {
       setLoading(true);
       setError(null);
       
+      // Garantizar que cuando se selecciona 'all', se envía undefined y no una cadena vacía
+      const folderIdToUse = 
+        !selectedFolder || selectedFolder === '' || selectedFolder === 'all' 
+          ? undefined 
+          : selectedFolder;
+      
+      console.log('Creando sesión con folderId:', folderIdToUse);
+      
       const session = await createStudySession(
         user.uid,
         mode,
-        selectedFolder && selectedFolder !== 'all' ? selectedFolder : undefined,
+        folderIdToUse,
         itemLimit
       );
+      
+      // Si no hay palabras para estudiar, mostrar un error
+      if (!session.itemsToReview.length) {
+        throw new Error('No hay palabras disponibles para estudiar con los criterios seleccionados.');
+      }
       
       onStartSession(session);
     } catch (err) {
       console.error('Error creating study session:', err);
-      setError('Error al crear la sesión de estudio. Por favor, intenta de nuevo.');
+      setError(`Error al crear la sesión de estudio: ${err instanceof Error ? err.message : 'Por favor, intenta de nuevo.'}`);
       setLoading(false);
     }
   };
@@ -279,7 +292,7 @@ export default function StudySessionSetup({ onStartSession }: StudySessionSetupP
         
         <div className="mt-8">
           <button
-            onClick={handleStartSession}
+            onClick={handleCreateSession}
             disabled={loading || !selectedFolder}
             className={`
               w-full py-3 px-4 rounded-lg font-medium text-white 
