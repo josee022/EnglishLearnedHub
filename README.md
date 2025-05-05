@@ -129,6 +129,20 @@ service cloud.firestore {
 - **Protección de Rutas**: Acceso restringido a rutas que requieren autenticación
 - **Contexto de Autenticación**: Estado global para datos de usuario y funciones de autenticación
 
+### Gestión de Vocabulario
+
+- **CRUD Completo**: Creación, edición y eliminación de palabras y frases
+- **Organización por Carpetas**: Sistema de carpetas temáticas para organizar el vocabulario
+- **Etiquetas y Ejemplos**: Posibilidad de añadir etiquetas y ejemplos a cada palabra
+- **Niveles de Dominio**: Sistema de seguimiento del nivel de proficiencia (1-5)
+
+### Sistema de Flashcards
+
+- **Repetición Espaciada**: Algoritmo SRS para optimizar el aprendizaje
+- **Modos de Estudio**: Opciones para practicar inglés → español, español → inglés o mixto
+- **Interfaz Interactiva**: Tarjetas 3D con animaciones y feedback visual
+- **Análisis de Resultados**: Resumen detallado al finalizar cada sesión de estudio
+
 ### Integración con Firestore
 
 - **Estructura de Datos**: Organización jerárquica de datos por usuario
@@ -137,17 +151,17 @@ service cloud.firestore {
 
 ## Características Planificadas
 
-### Gestión de Vocabulario
+### Integración de API de Diccionario
 
-- Creación, edición y eliminación de palabras y frases
-- Organización por carpetas temáticas
-- Sistema de etiquetas para clasificación
+- Búsqueda automática de definiciones y ejemplos
+- Sugerencias de palabras relacionadas
+- Descarga de pronunciaciones de audio
 
-### Sistema de Flashcards
+### Ampliación del Sistema de Flashcards
 
-- Creación de tarjetas de memoria
-- Sistema de repetición espaciada
-- Modos de práctica personalizables
+- Modos de estudio adicionales (completar oraciones, escuchar y escribir)
+- Gamificación (puntos, racha de estudio, logros)
+- Opción para compartir conjuntos de tarjetas
 
 ### Quizzes y Evaluaciones
 
@@ -171,11 +185,11 @@ service cloud.firestore {
 - Implementación de sistema de autenticación básico
 - Seguridad con variables de entorno
 
-### Fase 2: Funcionalidades Core (En Desarrollo)
+### Fase 2: Funcionalidades Core (Completada)
 
-- Gestión de vocabulario
-- Sistema de flashcards
-- Quizzes básicos
+- Gestión de vocabulario con organización por carpetas
+- Sistema de flashcards con repetición espaciada
+- Interfaz de usuario mejorada con accesibilidad
 
 ### Fase 3: Características Avanzadas (Planificada)
 

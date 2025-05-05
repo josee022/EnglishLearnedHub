@@ -21,6 +21,8 @@ export interface VocabularyItem {
   createdAt: Date;
   lastReviewed?: Date;
   proficiencyLevel: number; // 0-5 (0: No aprendido, 5: Dominado)
+  reviewCount: number; // Número de veces que se ha revisado la palabra
+  nextReviewDate?: Date; // Fecha calculada para la próxima revisión según SRS
 }
 
 // Tipos para carpetas/temas
@@ -40,6 +42,38 @@ export interface Quiz {
   folderId?: string;
   userId: string;
   createdAt: Date;
+}
+
+// Tipos para las sesiones de estudio con flashcards
+export interface StudySession {
+  id: string;
+  userId: string;
+  createdAt: Date;
+  endedAt?: Date;
+  folderId?: string; // Opcional, si la sesión es específica para una carpeta
+  mode: 'word-to-translation' | 'translation-to-word' | 'mixed';
+  itemsToReview: string[]; // IDs de los elementos a revisar
+  itemsReviewed: StudySessionResult[];
+  currentIndex: number; // Posición actual en la sesión
+  completed: boolean;
+}
+
+export interface StudySessionResult {
+  itemId: string;
+  wasCorrect: boolean;
+  timeTaken: number; // en milisegundos
+  answeredAt: Date;
+}
+
+// Tipos para algoritmo de repetición espaciada
+export interface SRSConfig {
+  // Intervalos en días para cada nivel de proficiencia (1-5)
+  intervals: {
+    [key: number]: number;
+  };
+  // Factores de penalización/bonificación
+  correctFactor: number; // Multiplicador si la respuesta es correcta
+  incorrectFactor: number; // Multiplicador si la respuesta es incorrecta
 }
 
 export interface QuizQuestion {

@@ -6,10 +6,13 @@ import {
   deleteDoc, 
   getDocs, 
   getDoc, 
-  Timestamp
+  Timestamp,
+  query,
+  orderBy,
+  limitToLast,
 } from 'firebase/firestore';
 import { db } from './config';
-import { VocabularyItem, Folder, Quiz } from '../types';
+import { VocabularyItem, Folder, Quiz, StudySession, StudySessionResult, SRSConfig } from '../types';
 
 // Conversión de Date a Timestamp para Firestore
 export const dateToTimestamp = (date: Date | null | undefined): Timestamp | undefined => {
@@ -24,8 +27,8 @@ export const timestampToDate = (timestamp: Timestamp | null | undefined): Date |
 };
 
 // Convertir un objeto con posibles campos Date a un objeto con campos Timestamp para Firestore
-// Utilizamos any como escape para compatibilidad con Firestore
-type FirestoreCompatible = Record<string, any>;
+// Utilizamos unknown como tipo para compatibilidad con Firestore
+type FirestoreCompatible = Record<string, unknown>;
 
 export const convertDatesToTimestamps = <T extends Record<string, unknown>>(
   obj: T, 
@@ -303,6 +306,340 @@ export const getQuizzes = async (userId: string) => {
     });
   } catch (error) {
     console.error('Error al obtener quizzes:', error);
+    throw error;
+  }
+};
+
+// Configuración predeterminada del sistema de repetición espaciada
+export const DEFAULT_SRS_CONFIG: SRSConfig = {
+  intervals: {
+    1: 1,   // 1 día para nivel 1
+    2: 3,   // 3 días para nivel 2
+    3: 7,   // 1 semana para nivel 3
+    4: 14,  // 2 semanas para nivel 4
+    5: 30   // 1 mes para nivel 5
+  },
+  correctFactor: 1.5,    // Si es correcto, aumenta el intervalo
+  incorrectFactor: 0.5   // Si es incorrecto, disminuye el intervalo
+};
+
+// Colección para las sesiones de estudio
+export const studySessionsCollection = (userId: string) => {
+  return collection(db, 'users', userId, 'studySessions');
+};
+
+/**
+ * Crear una nueva sesión de estudio
+ * @param userId ID del usuario
+ * @param mode Modo de estudio (word-to-translation, translation-to-word, mixed)
+ * @param folderId ID de la carpeta (opcional)
+ * @param limit Número máximo de elementos a estudiar (opcional)
+ */
+export const createStudySession = async (
+  userId: string,
+  mode: 'word-to-translation' | 'translation-to-word' | 'mixed',
+  folderId?: string,
+  itemLimit?: number
+): Promise<StudySession> => {
+  try {
+    // Obtener elementos de vocabulario para la sesión
+    const vocabularyItems = await getVocabularyItems(userId);
+    
+    // Filtrar por carpeta si se especifica
+    let filteredItems = vocabularyItems;
+    if (folderId) {
+      filteredItems = vocabularyItems.filter(item => item.folderId === folderId);
+    }
+    
+    // Ordenar según el algoritmo SRS (priorizar elementos con menor nivel de proficiencia
+    // y aquellos que están programados para revisión)
+    const now = new Date();
+    const sortedItems = filteredItems
+      .sort((a, b) => {
+        // Priorizar por nivel de proficiencia
+        const levelDiff = a.proficiencyLevel - b.proficiencyLevel;
+        if (levelDiff !== 0) return levelDiff;
+        
+        // Si tienen el mismo nivel, priorizar por fecha de próxima revisión
+        // Asegurarnos de que las fechas son objetos Date válidos
+        let aDate = now;
+        let bDate = now;
+        
+        // Validar que a.nextReviewDate es un objeto Date o puede convertirse en uno
+        if (a.nextReviewDate) {
+          if (a.nextReviewDate instanceof Date) {
+            aDate = a.nextReviewDate;
+          } else if (typeof a.nextReviewDate === 'object' && a.nextReviewDate.toDate) {
+            // Si es un Timestamp de Firestore
+            aDate = a.nextReviewDate.toDate();
+          } else {
+            console.warn('nextReviewDate no es un objeto Date válido:', a.nextReviewDate);
+          }
+        }
+        
+        // Validar que b.nextReviewDate es un objeto Date o puede convertirse en uno
+        if (b.nextReviewDate) {
+          if (b.nextReviewDate instanceof Date) {
+            bDate = b.nextReviewDate;
+          } else if (typeof b.nextReviewDate === 'object' && b.nextReviewDate.toDate) {
+            // Si es un Timestamp de Firestore
+            bDate = b.nextReviewDate.toDate();
+          } else {
+            console.warn('nextReviewDate no es un objeto Date válido:', b.nextReviewDate);
+          }
+        }
+        
+        return aDate.getTime() - bDate.getTime();
+      });
+    
+    // Limitar la cantidad de elementos si se especifica
+    const selectedItems = itemLimit && itemLimit > 0
+      ? sortedItems.slice(0, itemLimit)
+      : sortedItems;
+    
+    // Crear la sesión de estudio
+    const sessionId = doc(studySessionsCollection(userId)).id;
+    
+    // Crear un objeto base con todos los campos obligatorios
+    const sessionBase: Omit<StudySession, 'folderId'> = {
+      id: sessionId,
+      userId,
+      createdAt: new Date(),
+      mode,
+      itemsToReview: selectedItems.map(item => item.id),
+      itemsReviewed: [],
+      currentIndex: 0,
+      completed: false
+    };
+    
+    // Añadir folderId solo si no es undefined (Firestore no acepta undefined)
+    const session = folderId ? { ...sessionBase, folderId } : sessionBase;
+    
+    // Guardar en Firestore
+    const sessionDoc = doc(studySessionsCollection(userId), sessionId);
+    await setDoc(sessionDoc, convertDatesToTimestamps(session as Record<string, unknown>, ['createdAt']));
+    
+    return session;
+  } catch (error) {
+    console.error('Error creating study session:', error);
+    throw error;
+  }
+};
+
+/**
+ * Obtener una sesión de estudio por ID
+ * @param userId ID del usuario
+ * @param sessionId ID de la sesión
+ */
+export const getStudySession = async (userId: string, sessionId: string): Promise<StudySession | null> => {
+  try {
+    const sessionDoc = doc(studySessionsCollection(userId), sessionId);
+    const sessionSnapshot = await getDoc(sessionDoc);
+    
+    if (!sessionSnapshot.exists()) return null;
+    
+    const sessionData = sessionSnapshot.data();
+    return {
+      ...(sessionData as StudySession),
+      createdAt: timestampToDate(sessionData.createdAt as Timestamp) || new Date(),
+      endedAt: timestampToDate(sessionData.endedAt as Timestamp)
+    };
+  } catch (error) {
+    console.error('Error getting study session:', error);
+    throw error;
+  }
+};
+
+/**
+ * Registrar el resultado de una tarjeta en una sesión de estudio
+ * @param userId ID del usuario
+ * @param sessionId ID de la sesión
+ * @param itemId ID del elemento de vocabulario
+ * @param wasCorrect Si la respuesta fue correcta
+ * @param timeTaken Tiempo que tomó responder (en ms)
+ */
+export const recordFlashcardResult = async (
+  userId: string,
+  sessionId: string,
+  itemId: string,
+  wasCorrect: boolean,
+  timeTaken: number
+): Promise<void> => {
+  try {
+    // Obtener la sesión actual
+    const session = await getStudySession(userId, sessionId);
+    if (!session) throw new Error('Session not found');
+    
+    // Registrar el resultado
+    const result: StudySessionResult = {
+      itemId,
+      wasCorrect,
+      timeTaken,
+      answeredAt: new Date()
+    };
+    
+    // Actualizar la sesión
+    const sessionDoc = doc(studySessionsCollection(userId), sessionId);
+    await updateDoc(sessionDoc, {
+      itemsReviewed: [...session.itemsReviewed, convertDatesToTimestamps(result as Record<string, unknown>, ['answeredAt'])],
+      currentIndex: session.currentIndex + 1,
+      completed: session.currentIndex + 1 >= session.itemsToReview.length
+    });
+    
+    // Actualizar el elemento de vocabulario
+    await updateVocabularyItemProgress(userId, itemId, wasCorrect);
+  } catch (error) {
+    console.error('Error recording flashcard result:', error);
+    throw error;
+  }
+};
+
+/**
+ * Finalizar una sesión de estudio
+ * @param userId ID del usuario
+ * @param sessionId ID de la sesión
+ */
+export const completeStudySession = async (userId: string, sessionId: string): Promise<void> => {
+  try {
+    const sessionDoc = doc(studySessionsCollection(userId), sessionId);
+    await updateDoc(sessionDoc, {
+      completed: true,
+      endedAt: Timestamp.fromDate(new Date())
+    });
+    
+    // Actualizar estadísticas del usuario
+    const session = await getStudySession(userId, sessionId);
+    if (session) {
+      await updateUserProgress(userId, {
+        lastActivity: new Date()
+      });
+    }
+  } catch (error) {
+    console.error('Error completing study session:', error);
+    throw error;
+  }
+};
+
+/**
+ * Obtener las sesiones de estudio de un usuario
+ * @param userId ID del usuario
+ * @param limit Número máximo de sesiones a obtener
+ */
+export const getStudySessions = async (userId: string, limit?: number): Promise<StudySession[]> => {
+  try {
+    let sessionsQuery = query(
+      studySessionsCollection(userId),
+      orderBy('createdAt', 'desc')
+    );
+    
+    if (limit) {
+      sessionsQuery = query(sessionsQuery, limitToLast(limit));
+    }
+    
+    const sessionsSnapshot = await getDocs(sessionsQuery);
+    const sessions: StudySession[] = [];
+    
+    sessionsSnapshot.forEach(doc => {
+      const data = doc.data();
+      sessions.push({
+        ...data,
+        id: doc.id,
+        createdAt: timestampToDate(data.createdAt as Timestamp) || new Date(),
+        endedAt: timestampToDate(data.endedAt as Timestamp)
+      } as StudySession);
+    });
+    
+    return sessions;
+  } catch (error) {
+    console.error('Error getting study sessions:', error);
+    throw error;
+  }
+};
+
+/**
+ * Actualizar el progreso y nivel de proficiencia de un elemento de vocabulario
+ * @param userId ID del usuario
+ * @param itemId ID del elemento de vocabulario
+ * @param wasCorrect Si la respuesta fue correcta
+ */
+export const updateVocabularyItemProgress = async (
+  userId: string,
+  itemId: string,
+  wasCorrect: boolean
+): Promise<void> => {
+  try {
+    // Obtener el elemento actual
+    const item = await getVocabularyItem(userId, itemId);
+    if (!item) throw new Error('Vocabulary item not found');
+    
+    // Calcular el nuevo nivel de proficiencia
+    let newProficiencyLevel = item.proficiencyLevel;
+    if (wasCorrect && newProficiencyLevel < 5) {
+      newProficiencyLevel += 1;
+    } else if (!wasCorrect && newProficiencyLevel > 1) {
+      newProficiencyLevel -= 1;
+    }
+    
+    // Calcular la próxima fecha de revisión
+    const nextReviewDate = calculateNextReviewDate(newProficiencyLevel, wasCorrect);
+    
+    // Actualizar el elemento
+    const itemDoc = doc(vocabularyCollection(userId), itemId);
+    await updateDoc(itemDoc, {
+      proficiencyLevel: newProficiencyLevel,
+      lastReviewed: Timestamp.fromDate(new Date()),
+      nextReviewDate: Timestamp.fromDate(nextReviewDate),
+      reviewCount: (item.reviewCount || 0) + 1
+    });
+  } catch (error) {
+    console.error('Error updating vocabulary item progress:', error);
+    throw error;
+  }
+};
+
+/**
+ * Calcular la fecha de próxima revisión basada en el nivel de proficiencia
+ * @param proficiencyLevel Nivel de proficiencia (1-5)
+ * @param wasCorrect Si la última respuesta fue correcta
+ */
+export const calculateNextReviewDate = (proficiencyLevel: number, wasCorrect: boolean): Date => {
+  const now = new Date();
+  let intervalDays = DEFAULT_SRS_CONFIG.intervals[proficiencyLevel] || 1;
+  
+  // Aplicar factor según el resultado
+  intervalDays = wasCorrect
+    ? intervalDays * DEFAULT_SRS_CONFIG.correctFactor
+    : intervalDays * DEFAULT_SRS_CONFIG.incorrectFactor;
+  
+  // Agregar el intervalo a la fecha actual
+  now.setDate(now.getDate() + Math.round(intervalDays));
+  return now;
+};
+
+/**
+ * Obtener elementos de vocabulario para revisar hoy
+ * @param userId ID del usuario
+ * @param folderId ID de la carpeta (opcional)
+ */
+export const getVocabularyItemsDueForReview = async (
+  userId: string,
+  folderId?: string
+): Promise<VocabularyItem[]> => {
+  try {
+    const today = new Date();
+    const items = await getVocabularyItems(userId);
+    
+    return items.filter(item => {
+      // Filtrar por carpeta si se especifica
+      const inFolder = folderId ? item.folderId === folderId : true;
+      
+      // Comprobar si está pendiente de revisión
+      const isDue = !item.nextReviewDate || item.nextReviewDate <= today;
+      
+      return inFolder && isDue;
+    });
+  } catch (error) {
+    console.error('Error getting vocabulary items due for review:', error);
     throw error;
   }
 };
