@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getVocabularyItems, deleteVocabularyItem, getFolderById } from '../../firebase/firestore';
+import { getVocabularyItems, deleteVocabularyItem, getFolderById } from '../../firebase';
 import { useAuthContext } from '../../context/AuthContext';
 import { VocabularyItem } from '../../types';
 import VocabularyListItem from './VocabularyListItem';

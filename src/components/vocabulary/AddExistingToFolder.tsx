@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuthContext } from '../../context/AuthContext';
-import { getVocabularyItems, updateVocabularyItem } from '../../firebase/firestore';
+import { getVocabularyItems, updateVocabularyItem } from '../../firebase';
 import { VocabularyItem } from '../../types';
-import { XMarkIcon, ArrowRightIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, PlusIcon } from '@heroicons/react/24/outline';
 
 interface AddExistingToFolderProps {
   folderId: string;

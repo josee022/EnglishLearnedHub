@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getFolders, addFolder } from '../../firebase/firestore';
+import { getFolders, addFolder } from '../../firebase';
 import { useAuthContext } from '../../context/AuthContext';
 import { Folder } from '../../types';
 import { FolderIcon, PlusIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
