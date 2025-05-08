@@ -12,6 +12,7 @@ import { Dashboard } from './pages/Dashboard';
 import Vocabulary from './pages/Vocabulary';
 import Flashcards from './pages/Flashcards';
 import DictionaryPage from './pages/DictionaryPage';
+import Grammar from './pages/Grammar';
 
 // Estilos
 import './index.css';
@@ -47,6 +48,9 @@ function App() {
           
           {/* Ruta de diccionario */}
           <Route path="/dictionary" element={<ProtectedRoute><DictionaryPage /></ProtectedRoute>} />
+          
+          {/* Ruta de gramática */}
+          <Route path="/grammar" element={<ProtectedRoute><Grammar /></ProtectedRoute>} />
           
           <Route 
             path="/profile" 
