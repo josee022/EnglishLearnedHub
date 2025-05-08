@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Button } from '../components/ui/Button';
 import { Layout } from '../components/layout/Layout';
+import GrammarContent from '../components/grammar/GrammarContent';
+import { getGrammarContent, hasGrammarContent } from '../components/grammar/content';
 
 // Tipo para nuestros datos de gramática
 type GrammarCategory = {
@@ -184,7 +186,7 @@ const Grammar: React.FC = () => {
             ) : (
               <Button 
                 onClick={resetSelections}
-                variant="default"
+                variant="primary"
                 className="bg-blue-600 hover:bg-blue-700 text-white transition-all duration-300 dark:bg-blue-600 dark:hover:bg-blue-700 inline-flex items-center"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -265,69 +267,104 @@ const Grammar: React.FC = () => {
 
       {/* Contenido de la sección seleccionada */}
       {selectedSection && (
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 mb-8">
-            {/* Encabezado de la sección */}
-            <div className="mb-8 border-b border-slate-200 dark:border-slate-700 pb-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400">
-                  {grammarCategories
-                    .find(cat => cat.id === selectedCategory)
-                    ?.sections.find(sec => sec.id === selectedSection)?.title}
-                </h3>
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                  {grammarCategories.find(cat => cat.id === selectedCategory)?.title || ""}
-                </span>
+        <div className="max-w-7xl mx-auto">
+          {hasGrammarContent(selectedSection) ? (
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    {grammarCategories.find(cat => cat.id === selectedCategory)?.title || ""}
+                  </span>
+                </div>
+                <Button 
+                  onClick={resetSelections}
+                  variant="outline"
+                  className="text-slate-600 hover:text-blue-600 transition-colors inline-flex items-center dark:text-slate-300 dark:hover:text-blue-400"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  Volver a categorías
+                </Button>
               </div>
               
-              {/* Indicadores de navegación y aprendizaje */}
-              <div className="mt-6 flex flex-wrap gap-3">
-                <div className="bg-slate-100 px-3 py-1 rounded-md text-slate-700 text-sm inline-flex items-center dark:bg-slate-700 dark:text-slate-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
-                  Teoría y Ejemplos
-                </div>
-                <div className="bg-green-100 px-3 py-1 rounded-md text-green-700 text-sm inline-flex items-center dark:bg-green-900 dark:text-green-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  Trucos y Consejos
-                </div>
-              </div>
+              {/* Componente de contenido gramatical */}
+              <GrammarContent content={getGrammarContent(selectedSection)!} />
             </div>
-            
-            {/* Contenido de la sección */}
-            <div className="prose prose-slate prose-lg dark:prose-invert max-w-none">
-              <div className="p-6 bg-blue-50 border-l-4 border-blue-500 rounded-md mb-8 dark:bg-slate-700 dark:border-blue-400">
-                <p className="font-medium text-blue-600 dark:text-blue-300">
-                  Esta sección incluirá explicaciones detalladas, ejemplos prácticos y trucos útiles para dominar:
-                </p>
-                <p className="font-bold text-slate-700 dark:text-slate-300 mt-2">
-                  {getSelectedSectionContent()}
-                </p>
+          ) : (
+            <div className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 mb-8">
+              {/* Encabezado de la sección */}
+              <div className="mb-8 border-b border-slate-200 dark:border-slate-700 pb-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400">
+                    {grammarCategories
+                      .find(cat => cat.id === selectedCategory)
+                      ?.sections.find(sec => sec.id === selectedSection)?.title}
+                  </h3>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    {grammarCategories.find(cat => cat.id === selectedCategory)?.title || ""}
+                  </span>
+                </div>
+                
+                {/* Indicadores de navegación y aprendizaje */}
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <div className="bg-slate-100 px-3 py-1 rounded-md text-slate-700 text-sm inline-flex items-center dark:bg-slate-700 dark:text-slate-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    Teoría y Ejemplos
+                  </div>
+                  <div className="bg-green-100 px-3 py-1 rounded-md text-green-700 text-sm inline-flex items-center dark:bg-green-900 dark:text-green-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Trucos y Consejos
+                  </div>
+                </div>
               </div>
               
-              {/* Aquí irá el contenido completo cuando esté desarrollado */}
-              <p className="text-slate-600 dark:text-slate-400">
-                El contenido detallado de esta sección se está desarrollando para ofrecerte la mejor experiencia de aprendizaje posible.
-              </p>
+              {/* Contenido de la sección */}
+              <div className="prose prose-slate prose-lg dark:prose-invert max-w-none">
+                <div className="p-6 bg-blue-50 border-l-4 border-blue-500 rounded-md mb-8 dark:bg-slate-700 dark:border-blue-400">
+                  <p className="font-medium text-blue-600 dark:text-blue-300">
+                    Esta sección incluirá explicaciones detalladas, ejemplos prácticos y trucos útiles para dominar:
+                  </p>
+                  <p className="font-bold text-slate-700 dark:text-slate-300 mt-2">
+                    {getSelectedSectionContent()}
+                  </p>
+                </div>
+                
+                {/* Mensaje de contenido en desarrollo */}
+                <div className="bg-amber-50 p-6 rounded-lg border border-amber-200 dark:bg-amber-900/20 dark:border-amber-800">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-amber-100 rounded-full text-amber-600 text-xl mr-4 dark:bg-amber-800 dark:text-amber-300">
+                      🚧
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-amber-800 dark:text-amber-300 mb-2">Contenido en desarrollo</h3>
+                      <p className="text-slate-600 dark:text-slate-400">
+                        El contenido detallado de esta sección se está desarrollando para ofrecerte la mejor experiencia de aprendizaje posible. Puedes explorar el Present Simple que ya está disponible.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Botones de navegación */}
+              <div className="mt-10 pt-6 border-t border-slate-200 dark:border-slate-700 flex justify-between">
+                <Button 
+                  onClick={resetSelections}
+                  variant="outline"
+                  className="text-slate-600 hover:text-blue-600 transition-colors inline-flex items-center dark:text-slate-300 dark:hover:text-blue-400"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  Volver a categorías
+                </Button>
+              </div>
             </div>
-            
-            {/* Botones de navegación */}
-            <div className="mt-10 pt-6 border-t border-slate-200 dark:border-slate-700 flex justify-between">
-              <Button 
-                onClick={resetSelections}
-                variant="outline"
-                className="text-slate-600 hover:text-blue-600 transition-colors inline-flex items-center dark:text-slate-300 dark:hover:text-blue-400"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Volver a categorías
-              </Button>
-            </div>
-          </div>
+          )}
         </div>
       )}
       </div>
