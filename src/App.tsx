@@ -11,6 +11,7 @@ import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
 import Vocabulary from './pages/Vocabulary';
 import Flashcards from './pages/Flashcards';
+import DictionaryPage from './pages/DictionaryPage';
 
 // Estilos
 import './index.css';
@@ -44,17 +45,8 @@ function App() {
           <Route path="/flashcards" element={<ProtectedRoute><Flashcards /></ProtectedRoute>} />
           <Route path="/flashcards/:action" element={<ProtectedRoute><Flashcards /></ProtectedRoute>} />
           
-          <Route 
-            path="/quizzes" 
-            element={
-              <ProtectedRoute>
-                <div className="p-8 text-center">
-                  <h1 className="text-2xl font-bold mb-4">Quizzes</h1>
-                  <p>Esta sección está en desarrollo.</p>
-                </div>
-              </ProtectedRoute>
-            } 
-          />
+          {/* Ruta de diccionario */}
+          <Route path="/dictionary" element={<ProtectedRoute><DictionaryPage /></ProtectedRoute>} />
           
           <Route 
             path="/profile" 
