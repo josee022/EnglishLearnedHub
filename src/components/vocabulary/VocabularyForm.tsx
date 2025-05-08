@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { addVocabularyItem, updateVocabularyItem, getVocabularyItem, getFolders } from '../../firebase/firestore';
+import { addVocabularyItem, updateVocabularyItem, getVocabularyItem, getFolders } from '../../firebase';
 import { useAuthContext } from '../../context/AuthContext';
 import { VocabularyItem, Folder } from '../../types';
 import { PlusIcon, XMarkIcon, FolderIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
@@ -16,6 +16,7 @@ const emptyVocabularyItem: Omit<VocabularyItem, 'id'> = {
   notes: '',
   tags: [],
   proficiencyLevel: 0,
+  reviewCount: 0,
   createdAt: new Date(),
 };
 
