@@ -70,7 +70,7 @@ const Grammar: React.FC = () => {
         { id: 'first-conditional', title: 'First Conditional', content: 'Contenido del First Conditional' },
         { id: 'second-conditional', title: 'Second Conditional', content: 'Contenido del Second Conditional' },
         { id: 'third-conditional', title: 'Third Conditional', content: 'Contenido del Third Conditional' },
-        { id: 'mixed-conditionals', title: 'Mixed Conditionals', content: 'Contenido de los Mixed Conditionals' },
+        { id: 'mixed-conditional', title: 'Mixed Conditional', content: 'Contenido del Mixed Conditional' },
       ]
     },
     {

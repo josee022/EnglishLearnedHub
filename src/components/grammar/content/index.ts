@@ -3,14 +3,45 @@ import { presentSimpleContent } from './presentSimple';
 import { presentContinuousContent } from './presentContinuous';
 import { presentPerfectContent } from './presentPerfect';
 import { presentPerfectContinuousContent } from './presentPerfectContinuous';
+import { pastSimpleContent } from './pastSimple';
+import { pastContinuousContent } from './pastContinuous';
+import { pastPerfectContent } from './pastPerfect';
+import { pastPerfectContinuousContent } from './pastPerfectContinuous';
+import { futureSimpleContent } from './futureSimple';
+import { goingToContent } from './goingTo';
+import { futureContinuousContent } from './futureContinuous';
+import { futurePerfectContent } from './futurePerfect';
+import { futurePerfectContinuousContent } from './futurePerfectContinuous';
+import { zeroConditionalContent } from './zeroConditional';
+import { firstConditionalContent } from './firstConditional';
+import { secondConditionalContent } from './secondConditional';
+import { thirdConditionalContent } from './thirdConditional';
+import { mixedConditionalContent } from './mixedConditional';
 
 // Objeto que contiene todos los contenidos gramaticales indexados por ID
 export const grammarContents: { [key: string]: GrammarContent } = {
+  // Tiempos verbales
   [presentSimpleContent.id]: presentSimpleContent,
   [presentContinuousContent.id]: presentContinuousContent,
   [presentPerfectContent.id]: presentPerfectContent,
   [presentPerfectContinuousContent.id]: presentPerfectContinuousContent,
-  // Aquí se pueden añadir más tiempos verbales a medida que se vayan creando
+  [pastSimpleContent.id]: pastSimpleContent,
+  [pastContinuousContent.id]: pastContinuousContent,
+  [pastPerfectContent.id]: pastPerfectContent,
+  [pastPerfectContinuousContent.id]: pastPerfectContinuousContent,
+  [futureSimpleContent.id]: futureSimpleContent,
+  [goingToContent.id]: goingToContent,
+  [futureContinuousContent.id]: futureContinuousContent,
+  [futurePerfectContent.id]: futurePerfectContent,
+  [futurePerfectContinuousContent.id]: futurePerfectContinuousContent,
+  
+  // Condicionales
+  [zeroConditionalContent.id]: zeroConditionalContent,
+  [firstConditionalContent.id]: firstConditionalContent,
+  [secondConditionalContent.id]: secondConditionalContent,
+  [thirdConditionalContent.id]: thirdConditionalContent,
+  [mixedConditionalContent.id]: mixedConditionalContent,
+  // Aquí se pueden añadir más estructuras gramaticales a medida que se vayan creando
 };
 
 // Función para obtener el contenido gramatical por ID
