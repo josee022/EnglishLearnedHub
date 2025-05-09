@@ -29,6 +29,9 @@ import { canCouldContent } from './can-could';
 import { mayMightContent } from './may-might';
 import { mustHaveToContent } from './must-have-to';
 import { shouldOughtToContent } from './should-ought-to';
+import { usedToWouldContent } from './used-to-would';
+import { gerundsInfinitivesContent } from './gerunds-infinitives';
+import { relativeClausesContent } from './relative-clauses';
 
 // Objeto que contiene todos los contenidos gramaticales indexados por ID
 export const grammarContents: { [key: string]: GrammarContent } = {
@@ -71,6 +74,11 @@ export const grammarContents: { [key: string]: GrammarContent } = {
   [mayMightContent.id]: mayMightContent,
   [mustHaveToContent.id]: mustHaveToContent,
   [shouldOughtToContent.id]: shouldOughtToContent,
+  
+  // Estructuras Avanzadas
+  [usedToWouldContent.id]: usedToWouldContent,
+  [gerundsInfinitivesContent.id]: gerundsInfinitivesContent,
+  [relativeClausesContent.id]: relativeClausesContent,
   // Aquí se pueden añadir más estructuras gramaticales a medida que se vayan creando
 };
 
