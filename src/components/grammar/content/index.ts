@@ -25,6 +25,10 @@ import { statementsContent } from './statements';
 import { questionsContent } from './questions';
 import { commandsContent } from './commands';
 import { timeChangesContent } from './time-changes';
+import { canCouldContent } from './can-could';
+import { mayMightContent } from './may-might';
+import { mustHaveToContent } from './must-have-to';
+import { shouldOughtToContent } from './should-ought-to';
 
 // Objeto que contiene todos los contenidos gramaticales indexados por ID
 export const grammarContents: { [key: string]: GrammarContent } = {
@@ -61,6 +65,12 @@ export const grammarContents: { [key: string]: GrammarContent } = {
   [questionsContent.id]: questionsContent,
   [commandsContent.id]: commandsContent,
   [timeChangesContent.id]: timeChangesContent,
+  
+  // Verbos Modales
+  [canCouldContent.id]: canCouldContent,
+  [mayMightContent.id]: mayMightContent,
+  [mustHaveToContent.id]: mustHaveToContent,
+  [shouldOughtToContent.id]: shouldOughtToContent,
   // Aquí se pueden añadir más estructuras gramaticales a medida que se vayan creando
 };
 
