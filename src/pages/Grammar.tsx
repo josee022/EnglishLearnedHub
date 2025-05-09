@@ -107,7 +107,6 @@ const Grammar: React.FC = () => {
       id: 'advanced',
       title: 'Estructuras Avanzadas',
       sections: [
-        { id: 'wish-if-only', title: 'Wish / If only', content: 'Contenido de Wish / If only' },
         { id: 'used-to-would', title: 'Used to / Would', content: 'Contenido de Used to / Would' },
         { id: 'gerunds-infinitives', title: 'Gerundios e Infinitivos', content: 'Contenido de Gerundios e Infinitivos' },
         { id: 'relative-clauses', title: 'Cláusulas Relativas', content: 'Contenido de Cláusulas Relativas' },
