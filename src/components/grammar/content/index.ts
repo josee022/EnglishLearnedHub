@@ -17,6 +17,14 @@ import { firstConditionalContent } from './firstConditional';
 import { secondConditionalContent } from './secondConditional';
 import { thirdConditionalContent } from './thirdConditional';
 import { mixedConditionalContent } from './mixedConditional';
+import { passivePresentContent } from './passivePresent';
+import { passivePastContent } from './passivePast';
+import { passiveFutureContent } from './passiveFuture';
+import { passiveModalsContent } from './passiveModals';
+import { statementsContent } from './statements';
+import { questionsContent } from './questions';
+import { commandsContent } from './commands';
+import { timeChangesContent } from './time-changes';
 
 // Objeto que contiene todos los contenidos gramaticales indexados por ID
 export const grammarContents: { [key: string]: GrammarContent } = {
@@ -41,6 +49,18 @@ export const grammarContents: { [key: string]: GrammarContent } = {
   [secondConditionalContent.id]: secondConditionalContent,
   [thirdConditionalContent.id]: thirdConditionalContent,
   [mixedConditionalContent.id]: mixedConditionalContent,
+  
+  // Voz Pasiva
+  [passivePresentContent.id]: passivePresentContent,
+  [passivePastContent.id]: passivePastContent,
+  [passiveFutureContent.id]: passiveFutureContent,
+  [passiveModalsContent.id]: passiveModalsContent,
+  
+  // Reported Speech
+  [statementsContent.id]: statementsContent,
+  [questionsContent.id]: questionsContent,
+  [commandsContent.id]: commandsContent,
+  [timeChangesContent.id]: timeChangesContent,
   // Aquí se pueden añadir más estructuras gramaticales a medida que se vayan creando
 };
 
