@@ -13,6 +13,8 @@ import Vocabulary from './pages/Vocabulary';
 import Flashcards from './pages/Flashcards';
 import DictionaryPage from './pages/DictionaryPage';
 import Grammar from './pages/Grammar';
+import Games from './pages/Games';
+import HangmanPage from './pages/HangmanPage';
 
 // Estilos
 import './index.css';
@@ -51,6 +53,10 @@ function App() {
           
           {/* Ruta de gramática */}
           <Route path="/grammar" element={<ProtectedRoute><Grammar /></ProtectedRoute>} />
+          
+          {/* Rutas de juegos */}
+          <Route path="/games" element={<ProtectedRoute><Games /></ProtectedRoute>} />
+          <Route path="/games/hangman" element={<ProtectedRoute><HangmanPage /></ProtectedRoute>} />
           
           <Route 
             path="/profile" 
