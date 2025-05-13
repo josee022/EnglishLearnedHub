@@ -51,7 +51,7 @@ const Games: React.FC = () => {
       description: 'Pon a prueba tu conocimiento con preguntas de opción múltiple sobre tu vocabulario.',
       icon: '❓',
       color: 'from-cyan-500 to-blue-600',
-      status: 'próximamente',
+      status: 'disponible',
     },
   ];
 

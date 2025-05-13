@@ -19,6 +19,7 @@ import MemoryGamePage from './pages/MemoryGamePage';
 import WordSearchPage from './pages/WordSearchPage';
 import ConnectionsGamePage from './pages/ConnectionsGamePage';
 import WordOrderingPage from './pages/WordOrderingPage';
+import QuizPage from './pages/QuizPage';
 
 // Estilos
 import './index.css';
@@ -65,6 +66,7 @@ function App() {
           <Route path="/games/wordsearch" element={<ProtectedRoute><WordSearchPage /></ProtectedRoute>} />
           <Route path="/games/connections" element={<ProtectedRoute><ConnectionsGamePage /></ProtectedRoute>} />
           <Route path="/games/wordordering" element={<ProtectedRoute><WordOrderingPage /></ProtectedRoute>} />
+          <Route path="/games/quiz" element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
           
           <Route 
             path="/profile" 
