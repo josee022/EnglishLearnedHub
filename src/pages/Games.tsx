@@ -6,12 +6,12 @@ const Games: React.FC = () => {
   // Datos de los juegos disponibles
   const gamesList = [
     {
-      id: 'crossword',
-      title: 'Crucigrama',
-      description: 'Rellena el crucigrama con palabras de tu vocabulario usando las traducciones como pistas.',
-      icon: '🎮',
+      id: 'connections',
+      title: 'Conexiones',
+      description: 'Conecta cada palabra en inglés con su traducción en español arrastrando líneas entre ellas.',
+      icon: '🔗',
       color: 'from-blue-500 to-indigo-600',
-      status: 'próximamente', // 'disponible' o 'próximamente'
+      status: 'disponible', // 'disponible' o 'próximamente'
     },
     {
       id: 'hangman',
@@ -30,20 +30,20 @@ const Games: React.FC = () => {
       status: 'disponible',
     },
     {
+      id: 'wordordering',
+      title: 'Ordenar Letras',
+      description: 'Ordena las letras para formar la palabra correcta en inglés a partir de su traducción.',
+      icon: '🔀',
+      color: 'from-teal-500 to-cyan-600',
+      status: 'disponible',
+    },
+    {
       id: 'wordsearch',
       title: 'Sopa de Letras',
       description: 'Busca palabras ocultas en todas direcciones en una cuadrícula de letras.',
       icon: '🔍',
       color: 'from-amber-500 to-orange-600',
       status: 'disponible',
-    },
-    {
-      id: 'wordscramble',
-      title: 'Ordenar Palabras',
-      description: 'Ordena las palabras desordenadas para formar frases correctas en inglés.',
-      icon: '📝',
-      color: 'from-red-500 to-rose-600',
-      status: 'próximamente',
     },
     {
       id: 'quiz',
@@ -88,16 +88,6 @@ const Games: React.FC = () => {
                 </svg>
                 100% gratuito
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Navegación y filtros */}
-        <div className="mb-8 bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 border border-slate-200 dark:border-slate-700">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-2">Explora los juegos</h2>
-              <p className="text-slate-600 dark:text-slate-400 text-sm">Selecciona un juego para comenzar a practicar</p>
             </div>
           </div>
         </div>
