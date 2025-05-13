@@ -27,7 +27,7 @@ const Games: React.FC = () => {
       description: 'Encuentra las parejas de palabras y sus traducciones en este juego de memoria.',
       icon: '🧠',
       color: 'from-purple-500 to-pink-600',
-      status: 'próximamente',
+      status: 'disponible',
     },
     {
       id: 'wordsearch',
