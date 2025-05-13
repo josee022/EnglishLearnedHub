@@ -13,6 +13,13 @@ import Vocabulary from './pages/Vocabulary';
 import Flashcards from './pages/Flashcards';
 import DictionaryPage from './pages/DictionaryPage';
 import Grammar from './pages/Grammar';
+import Games from './pages/Games';
+import HangmanPage from './pages/HangmanPage';
+import MemoryGamePage from './pages/MemoryGamePage';
+import WordSearchPage from './pages/WordSearchPage';
+import ConnectionsGamePage from './pages/ConnectionsGamePage';
+import WordOrderingPage from './pages/WordOrderingPage';
+import QuizPage from './pages/QuizPage';
 
 // Estilos
 import './index.css';
@@ -51,6 +58,15 @@ function App() {
           
           {/* Ruta de gramática */}
           <Route path="/grammar" element={<ProtectedRoute><Grammar /></ProtectedRoute>} />
+          
+          {/* Rutas de juegos */}
+          <Route path="/games" element={<ProtectedRoute><Games /></ProtectedRoute>} />
+          <Route path="/games/hangman" element={<ProtectedRoute><HangmanPage /></ProtectedRoute>} />
+          <Route path="/games/memory" element={<ProtectedRoute><MemoryGamePage /></ProtectedRoute>} />
+          <Route path="/games/wordsearch" element={<ProtectedRoute><WordSearchPage /></ProtectedRoute>} />
+          <Route path="/games/connections" element={<ProtectedRoute><ConnectionsGamePage /></ProtectedRoute>} />
+          <Route path="/games/wordordering" element={<ProtectedRoute><WordOrderingPage /></ProtectedRoute>} />
+          <Route path="/games/quiz" element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
           
           <Route 
             path="/profile" 
