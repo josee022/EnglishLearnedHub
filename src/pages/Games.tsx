@@ -35,7 +35,7 @@ const Games: React.FC = () => {
       description: 'Busca palabras ocultas en todas direcciones en una cuadrícula de letras.',
       icon: '🔍',
       color: 'from-amber-500 to-orange-600',
-      status: 'próximamente',
+      status: 'disponible',
     },
     {
       id: 'wordscramble',

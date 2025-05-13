@@ -16,6 +16,7 @@ import Grammar from './pages/Grammar';
 import Games from './pages/Games';
 import HangmanPage from './pages/HangmanPage';
 import MemoryGamePage from './pages/MemoryGamePage';
+import WordSearchPage from './pages/WordSearchPage';
 
 // Estilos
 import './index.css';
@@ -59,6 +60,7 @@ function App() {
           <Route path="/games" element={<ProtectedRoute><Games /></ProtectedRoute>} />
           <Route path="/games/hangman" element={<ProtectedRoute><HangmanPage /></ProtectedRoute>} />
           <Route path="/games/memory" element={<ProtectedRoute><MemoryGamePage /></ProtectedRoute>} />
+          <Route path="/games/wordsearch" element={<ProtectedRoute><WordSearchPage /></ProtectedRoute>} />
           
           <Route 
             path="/profile" 
