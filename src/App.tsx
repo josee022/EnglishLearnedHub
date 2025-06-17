@@ -30,6 +30,7 @@ import QuizPage from "./pages/QuizPage";
 import "./index.css";
 
 import { useAuthContext } from "./context/AuthContext";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -192,10 +193,7 @@ function AppRoutes() {
         path="/profile"
         element={
           <ProtectedRoute>
-            <div className="p-8 text-center">
-              <h1 className="text-2xl font-bold mb-4">Mi Perfil</h1>
-              <p>Esta sección está en desarrollo.</p>
-            </div>
+            <Profile />
           </ProtectedRoute>
         }
       />

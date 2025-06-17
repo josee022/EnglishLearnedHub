@@ -81,22 +81,29 @@ export const Navbar: React.FC = () => {
 
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
             {user ? (
-              <div className="flex items-center space-x-4">
-                <Link to="/profile" className="text-sm text-gray-700 dark:text-gray-300">
-                  {user.displayName || 'Usuario'}
+              <div className="flex items-center gap-3">
+                <Link to="/profile" className="flex items-center gap-2 group">
+                  <img
+                    src={user.photoURL || '/avatar-placeholder.png'}
+                    alt="Avatar"
+                    className="w-8 h-8 rounded-full border border-slate-300 dark:border-slate-700 object-cover group-hover:ring-2 group-hover:ring-blue-400 transition"
+                  />
+                  <span className="text-gray-800 dark:text-gray-100 font-semibold group-hover:underline">
+                    {user.displayName}
+                  </span>
                 </Link>
                 <button
-                  onClick={() => logout()}
-                  className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                  onClick={logout}
+                  className="ml-2 px-3 py-1 rounded bg-slate-200 dark:bg-slate-700 text-gray-700 dark:text-gray-200 hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
                 >
                   Cerrar sesión
                 </button>
               </div>
             ) : (
-              <div className="flex items-center space-x-4">
+              <div className="flex gap-2">
                 <Link
                   to="/login"
-                  className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                  className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
                 >
                   Iniciar sesión
                 </Link>
