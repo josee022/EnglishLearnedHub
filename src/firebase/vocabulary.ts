@@ -6,7 +6,8 @@ import {
   deleteDoc, 
   getDocs, 
   getDoc, 
-  Timestamp
+  Timestamp,
+  FieldValue
 } from 'firebase/firestore';
 import { db } from './config';
 import { VocabularyItem } from '../types';
@@ -77,7 +78,7 @@ export const updateVocabularyItem = async (userId: string, itemId: string, data:
       updateDataForFirestore.lastReviewed = Timestamp.fromDate(data.lastReviewed);
     }
     
-    await updateDoc(docRef, updateDataForFirestore as Record<string, unknown>);
+    await updateDoc(docRef, updateDataForFirestore as unknown as { [x: string]: FieldValue | Partial<unknown> | undefined });
   } catch (error) {
     console.error('Error al actualizar vocabulario:', error);
     throw error;

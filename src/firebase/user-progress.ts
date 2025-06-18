@@ -3,7 +3,8 @@ import {
   getDoc, 
   setDoc, 
   updateDoc, 
-  Timestamp 
+  Timestamp,
+  FieldValue 
 } from 'firebase/firestore';
 import { db } from './config';
 import { convertTimestampsToDates } from './utils';
@@ -45,11 +46,11 @@ export const updateUserProgress = async (
     
     if (docSnap.exists()) {
       // Actualizar documento existente
-      await updateDoc(docRef, updateData);
+      await updateDoc(docRef, updateData as unknown as { [x: string]: FieldValue | Partial<unknown> | undefined });
     } else {
       // Crear nuevo documento
-      await setDoc(docRef, updateData);
-    }
+      await setDoc(docRef, updateData as unknown as { [x: string]: FieldValue | Partial<unknown> | undefined });
+    }    
   } catch (error) {
     console.error('Error al actualizar progreso del usuario:', error);
     throw error;

@@ -14,10 +14,13 @@ async function updateProfileName(newName: string) {
 
 // Subir imagen a Cloudinary y devolver la URL
 async function uploadImageToCloudinary(file: File): Promise<string> {
-  const url = `https://api.cloudinary.com/v1_1/dksnj4jzq/image/upload`;
+  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
+  const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
   const formData = new FormData();
   formData.append('file', file);
-  formData.append('upload_preset', 'englishlearnedhub'); // Tu upload preset unsigned
+  formData.append('upload_preset', uploadPreset);
 
   const res = await fetch(url, {
     method: 'POST',
@@ -25,7 +28,7 @@ async function uploadImageToCloudinary(file: File): Promise<string> {
   });
   if (!res.ok) throw new Error('Error al subir imagen a Cloudinary');
   const data = await res.json();
-  return data.secure_url; // URL de la imagen subida
+  return data.secure_url;
 }
 
 // Actualiza el avatar en Auth y Firestore/contexto

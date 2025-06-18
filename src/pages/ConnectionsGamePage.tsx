@@ -166,7 +166,7 @@ const ConnectionsGamePage: React.FC = () => {
   }, [vocabularyWords, difficulty]);
   
   // Manejar inicio de conexión
-  const handleConnectionStart = (id: number, isWord: boolean, event: React.MouseEvent) => {
+  const handleConnectionStart = (id: number, _isWord: boolean, event: React.MouseEvent) => {
     // Obtener la posición del elemento
     const rect = event.currentTarget.getBoundingClientRect();
     const startX = rect.left + rect.width;
