@@ -1,11 +1,51 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { useAuthContext } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
+import { useUserRecentActivity } from '../hooks/useUserRecentActivity';
+
+// Componente de paginación para el feed de actividad
+const PaginatedActivityFeed: React.FC<{ activities: any[]; pageSize: number }> = ({ activities, pageSize }) => {
+  const [page, setPage] = useState(1);
+  const totalPages = Math.ceil(activities.length / pageSize);
+  const startIdx = (page - 1) * pageSize;
+  const endIdx = startIdx + pageSize;
+  const currentActivities = activities.slice(startIdx, endIdx);
+
+  return (
+    <>
+      <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+        {currentActivities.map((activity, idx) => (
+          <li key={startIdx + idx} className="py-4 flex items-center gap-4">
+            <span className="inline-block w-3 h-3 rounded-full mr-2"
+              style={{ backgroundColor: activity.type === 'vocab_add' ? '#3b82f6' : activity.type === 'study_session' ? '#10b981' : '#a855f7' }}
+            ></span>
+            <span className="flex-1 text-gray-800 dark:text-gray-100">{activity.label}</span>
+            <span className="text-xs text-gray-400">{activity.date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+          </li>
+        ))}
+      </ul>
+      <div className="flex justify-center gap-2 mt-4">
+        <button
+          className="px-3 py-1 rounded bg-slate-200 dark:bg-slate-700 text-gray-700 dark:text-gray-200 disabled:opacity-50"
+          onClick={() => setPage((p) => Math.max(1, p - 1))}
+          disabled={page === 1}
+        >Anterior</button>
+        <span className="px-2 py-1 text-sm text-gray-500 dark:text-gray-400">Página {page} de {totalPages}</span>
+        <button
+          className="px-3 py-1 rounded bg-slate-200 dark:bg-slate-700 text-gray-700 dark:text-gray-200 disabled:opacity-50"
+          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+          disabled={page === totalPages}
+        >Siguiente</button>
+      </div>
+    </>
+  );
+};
 
 export const Dashboard: React.FC = () => {
   const { user } = useAuthContext();
+  const { activities, isLoading, error, wordsLearned, streak } = useUserRecentActivity(10);
 
   return (
     <Layout>
@@ -19,35 +59,42 @@ export const Dashboard: React.FC = () => {
           </p>
         </div>
 
+        {/* Estado de carga y error */}
+        {isLoading && (
+          <div className="flex justify-center p-6">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+          </div>
+        )}
+        {error && (
+          <div className="p-4 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-md mb-4">
+            Error al cargar tus estadísticas. Intenta de nuevo.
+          </div>
+        )}
+
         {/* Stats Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
             <h3 className="text-lg font-medium text-gray-600 dark:text-gray-400 mb-1">Palabras aprendidas</h3>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">0</p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-white">
+              {wordsLearned}
+            </p>
             <div className="mt-4">
               <Link to="/vocabulary">
                 <Button variant="outline" size="sm">Ver vocabulario</Button>
               </Link>
             </div>
           </div>
-          
           <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
             <h3 className="text-lg font-medium text-gray-600 dark:text-gray-400 mb-1">Racha actual</h3>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">0 días</p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-white">
+              {streak} días
+            </p>
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-4">
-              <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: '0%' }}></div>
+              <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${streak ? Math.min(streak * 10, 100) : 0}%` }}></div>
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">0% hacia tu próxima meta</p>
-          </div>
-          
-          <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
-            <h3 className="text-lg font-medium text-gray-600 dark:text-gray-400 mb-1">Quizzes completados</h3>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">0</p>
-            <div className="mt-4">
-              <Link to="/quizzes">
-                <Button variant="outline" size="sm">Hacer un quiz</Button>
-              </Link>
-            </div>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+              {streak ? Math.min(streak * 10, 100) : 0}% hacia tu próxima meta
+            </p>
           </div>
         </div>
 
@@ -80,14 +127,14 @@ export const Dashboard: React.FC = () => {
             </Link>
             
             <Link 
-              to="/quizzes/new" 
+              to="/games" 
               className="bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/40 rounded-lg p-4 transition-colors"
             >
               <div className="flex flex-col items-center text-center">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-purple-600 dark:text-purple-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
-                <span className="font-medium">Nuevo quiz</span>
+                <span className="font-medium">Aprende jugando</span>
               </div>
             </Link>
             
@@ -105,23 +152,35 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Recent Activity - Placeholder */}
+        {/* Recent Activity Feed */}
         <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Actividad reciente</h2>
-          <div className="text-center py-12">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">No hay actividad reciente</h3>
-            <p className="mt-1 text-gray-500 dark:text-gray-400">
-              ¡Comienza a aprender para ver tu actividad aquí!
-            </p>
-            <div className="mt-6">
-              <Link to="/vocabulary/add">
-                <Button>Empezar ahora</Button>
-              </Link>
+          {isLoading ? (
+            <div className="flex justify-center p-6">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
             </div>
-          </div>
+          ) : error ? (
+            <div className="p-4 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-md mb-4">
+              Error al cargar tu actividad reciente. Intenta de nuevo.
+            </div>
+          ) : activities.length === 0 ? (
+            <div className="text-center py-12">
+              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">No hay actividad reciente</h3>
+              <p className="mt-1 text-gray-500 dark:text-gray-400">
+                ¡Comienza a aprender para ver tu actividad aquí!
+              </p>
+              <div className="mt-6">
+                <Link to="/vocabulary/add">
+                  <Button>Empezar ahora</Button>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <PaginatedActivityFeed activities={activities} pageSize={5} />
+          )}
         </div>
       </div>
     </Layout>
