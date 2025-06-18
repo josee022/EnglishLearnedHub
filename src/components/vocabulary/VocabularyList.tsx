@@ -102,16 +102,31 @@ export default function VocabularyList() {
   };
 
   // Filtrar por búsqueda y carpeta
-  const filteredItems = vocabularyItems.filter(item => {
-    const matchesSearch = 
-      item.word.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      item.translation.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.notes && item.notes.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesFolder = selectedFolder === null || item.folderId === selectedFolder;
-    
-    return matchesSearch && matchesFolder;
-  });
+  // --- Paginación ---
+const ITEMS_PER_PAGE = 12;
+const [currentPage, setCurrentPage] = useState(1);
+
+const filteredItems = vocabularyItems.filter(item => {
+  const matchesSearch = 
+    item.word.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    item.translation.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (item.notes && item.notes.toLowerCase().includes(searchTerm.toLowerCase()));
+  
+  const matchesFolder = selectedFolder === null || item.folderId === selectedFolder;
+  
+  return matchesSearch && matchesFolder;
+});
+
+const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
+const paginatedItems = filteredItems.slice(
+  (currentPage - 1) * ITEMS_PER_PAGE,
+  currentPage * ITEMS_PER_PAGE
+);
+
+// Reiniciar página al cambiar de filtro
+useEffect(() => {
+  setCurrentPage(1);
+}, [searchTerm, selectedFolder]);
 
   if (loading) {
     return (
@@ -243,7 +258,7 @@ export default function VocabularyList() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-          {filteredItems.map(item => (
+          {paginatedItems.map(item => (
             <VocabularyListItem
               key={item.id}
               item={item}
@@ -256,6 +271,35 @@ export default function VocabularyList() {
         </div>
       )}
       
+      {/* Controles de paginación */}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-8 gap-2">
+          <button
+            className="px-3 py-1 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 transition"
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+          >
+            Anterior
+          </button>
+          {[...Array(totalPages)].map((_, idx) => (
+            <button
+              key={idx}
+              className={`px-3 py-1 rounded ${currentPage === idx + 1 ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200'} hover:bg-blue-500 hover:text-white transition`}
+              onClick={() => setCurrentPage(idx + 1)}
+            >
+              {idx + 1}
+            </button>
+          ))}
+          <button
+            className="px-3 py-1 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 transition"
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+          >
+            Siguiente
+          </button>
+        </div>
+      )}
+
       {/* Modal para añadir palabras existentes */}
       {showAddExistingModal && selectedFolder && (
         <AddExistingToFolder
